@@ -3,15 +3,12 @@
 
 import streamlit as st
 from st_custom_components import st_audiorec
-
-#******************
-import streamlit as st
+from io import BytesIO
 import openai
 #import pyttsx3
 #import sounddevice as sd
 import soundfile as sf
 import numpy as np
-
 # Load environment variables
 from dotenv import load_dotenv
 import os
