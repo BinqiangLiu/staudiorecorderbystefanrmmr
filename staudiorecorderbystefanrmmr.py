@@ -1,4 +1,5 @@
 # streamlit_audio_recorder by stefanrmmr (rs. analytics) - version January 2023
+#https://github.com/stefanrmmr/streamlit_audio_recorder
 
 import streamlit as st
 from st_custom_components import st_audiorec
@@ -7,7 +8,7 @@ from st_custom_components import st_audiorec
 import streamlit as st
 import openai
 #import pyttsx3
-import sounddevice as sd
+#import sounddevice as sd
 import soundfile as sf
 import numpy as np
 
