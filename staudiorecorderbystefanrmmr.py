@@ -6,7 +6,7 @@ from st_custom_components import st_audiorec
 #******************
 import streamlit as st
 import openai
-import pyttsx3
+#import pyttsx3
 import sounddevice as sd
 import soundfile as sf
 import numpy as np
@@ -94,16 +94,16 @@ def chat_with_openai(input_text):
     return response["choices"][0]["message"]["content"]
 
 # Function to convert text to speech using pyttsx3
-def text_to_speech(text):
-    engine = pyttsx3.init()
-    engine.setProperty("rate", 150)
-    engine.setProperty("voice", "english-us")
-    engine.save_to_file(text, "response.mp3")
-    engine.runAndWait()
-    with open("response.mp3", "rb") as file:
-        response_audio = file.read()
+#def text_to_speech(text):
+#    engine = pyttsx3.init()
+#    engine.setProperty("rate", 150)
+#    engine.setProperty("voice", "english-us")
+#    engine.save_to_file(text, "response.mp3")
+#    engine.runAndWait()
+#    with open("response.mp3", "rb") as file:
+#        response_audio = file.read()
 #    os.remove("response.mp3")  # Remove the temporary audio file
-    return response_audio
+#    return response_audio
 
 # Main function to run the Streamlit app
 # def main():
