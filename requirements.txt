@@ -1,5 +1,5 @@
 openai
-pyttsx3
+#pyttsx3
 python-dotenv
 streamlit
 numpy
