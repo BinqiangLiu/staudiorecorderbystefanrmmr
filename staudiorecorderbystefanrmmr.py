@@ -15,6 +15,9 @@ import os
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
+system_message=""
+transcript=""
+
 # Global variable to hold the chat history, initialize with system role
 conversation = [{"role": "system", "content": "You are an intelligent professor."}]
 #******************
@@ -33,25 +36,10 @@ st.markdown('''<style>.css-v37k9u a {color: #ff4c4b;}</style>''',
             unsafe_allow_html=True)  # darkmode
 st.markdown('''<style>.css-nlntq9 a {color: #ff4c4b;}</style>''',
             unsafe_allow_html=True)  # lightmode
-
-
-def audiorec_demo_app():
-
-    # TITLE and Creator information
-    st.title('by Stefan streamlit audio recorder')
-    st.markdown('Implemented by '
-        '[Stefan Rummer](https://www.linkedin.com/in/stefanrmmr/) - '
-        'view project source code on '
-        '[GitHub](https://github.com/stefanrmmr/streamlit_audio_recorder)')
-    st.write('\n\n')
-
-    # TUTORIAL: How to use STREAMLIT AUDIO RECORDER?
-    # by calling this function an instance of the audio recorder is created
-    # once a recording is completed, audio data will be saved to wav_audio_data
-
-    audio = st_audiorec() # tadaaaa! yes, that's it! :D
-
-    if audio is not None:
+   # TITLE and Creator information
+st.title('by Stefan streamlit audio recorder')
+audio = st_audiorec() # tadaaaa! yes, that's it! :D
+if audio is not None:
     # To play audio in frontend:
     st.write("你输入的语音")
     st.audio(audio.tobytes())    
@@ -66,6 +54,7 @@ def audiorec_demo_app():
             response_format="text"        
         )
     print("Transcript of your questions:",  transcript)
+    st.write("Transcript of your questions:",  transcript)
 #    print("Transcript of your questions:",  transcript["text"])
 
 #   ChatGPT API
@@ -91,11 +80,9 @@ def audiorec_demo_app():
 #    st.write("你的提问（语音转文字）: " + transcript["text"])
     st.write("AI回答（文字）: " + system_message)
     st.header("第二步：语音播放AI的回答")
-
-language = detect(system_message)
-
-st.write("检测到输出语言:", language)
-print(language)
+    language = detect(system_message)
+    st.write("检测到输出语言:", language)
+    print(language)
 
 def text_to_speech(text):
     try:
