@@ -38,7 +38,7 @@ st.markdown('''<style>.css-nlntq9 a {color: #ff4c4b;}</style>''',
 def audiorec_demo_app():
 
     # TITLE and Creator information
-    st.title('streamlit audio recorder')
+    st.title('by Stefan streamlit audio recorder')
     st.markdown('Implemented by '
         '[Stefan Rummer](https://www.linkedin.com/in/stefanrmmr/) - '
         'view project source code on '
@@ -49,70 +49,78 @@ def audiorec_demo_app():
     # by calling this function an instance of the audio recorder is created
     # once a recording is completed, audio data will be saved to wav_audio_data
 
-    wav_audio_data = st_audiorec() # tadaaaa! yes, that's it! :D
+    audio = st_audiorec() # tadaaaa! yes, that's it! :D
 
-    if wav_audio_data is not None:
-        # display audio data as received on the Python side
-        col_playback, col_space = st.columns([0.58,0.42])
-        with col_playback:
-            st.audio(wav_audio_data, format='audio/wav')
+    if audio is not None:
+    # To play audio in frontend:
+    st.write("你输入的语音")
+    st.audio(audio.tobytes())    
+    # To save audio to a file:/可以视为是临时文件，就是用于语音转文本用
+    audio_file = open("audiorecorded.wav", "wb")    
+    audio_file.write(audio.tobytes())
+    audio_file.close()
+    with open("audiorecorded.wav", "rb") as sst_audio_file:
+        transcript = openai.Audio.transcribe(
+            file = sst_audio_file,
+            model = "whisper-1",
+            response_format="text"        
+        )
+    print("Transcript of your questions:",  transcript)
+#    print("Transcript of your questions:",  transcript["text"])
 
-#调用函数进行语音wav_audio_data转文字
-    with st.spinner("Processing..."):
-        text = transcribe_audio(wav_audio_data)
-        response = chat_with_openai(text)
-
-    # add some spacing and informative messages
-    col_info, col_space = st.columns([0.57, 0.43])
-    with col_info:
-        st.write('\n')  # add vertical spacer
-        st.write('\n')  # add vertical spacer
-        st.write('The .wav audio data, as received in the backend Python code,'
-                 ' will be displayed below this message as soon as it has'
-                 ' been processed. [This informative message is not part of'
-                 ' the audio recorder and can be removed easily] 🎈')
-
-#******************
-# Function to transcribe audio using OpenAI's Whisper API
-# 定于使用OpenAI's Whisper API将语音转文字的函数
-def transcribe_audio(wav_audio_data):
-    audio_file = "audio_input.wav"
-    sf.write(audio_file, wav_audio_data, 44100, format="wav")
-    with open(audio_file, "rb") as file:
-        transcript = openai.Audio.transcribe("whisper-1", file)
-    os.remove(audio_file)  # Remove the temporary audio file
-    return transcript["text"]
-
-# Function to perform chat with OpenAI GPT-3
-def chat_with_openai(input_text):
+#   ChatGPT API
+#   append user's inut to conversation
+    conversation.append({"role": "user", "content": transcript})
+#    conversation.append({"role": "user", "content": transcript["text"]})
+    
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": input_text}],
-    )
-    return response["choices"][0]["message"]["content"]
+    model="gpt-3.5-turbo",
+    messages=conversation
+    )    
+    print(response)
 
-# Function to convert text to speech using pyttsx3
-#def text_to_speech(text):
-#    engine = pyttsx3.init()
-#    engine.setProperty("rate", 150)
-#    engine.setProperty("voice", "english-us")
-#    engine.save_to_file(text, "response.mp3")
-#    engine.runAndWait()
-#    with open("response.mp3", "rb") as file:
-#        response_audio = file.read()
-#    os.remove("response.mp3")  # Remove the temporary audio file
-#    return response_audio
+#   system_message is the response from ChatGPT API
+    system_message = response["choices"][0]["message"]["content"]
 
-# Main function to run the Streamlit app
-# def main():
-#     st.title("Audio to Chat App")
+#   append ChatGPT response (assistant role) back to conversation
+    conversation.append({"role": "assistant", "content": system_message})
 
-    # Audio input section
-#     st.header("Step 1: Speak to the AI")
-#     st.write("Click the 'Start Recording' button and speak to the AI.")
-#******************
+# Display the chat history
+    st.header("你和AI的问答文字记录")
+    st.write("你的提问（语音转文字）: " + transcript)
+#    st.write("你的提问（语音转文字）: " + transcript["text"])
+    st.write("AI回答（文字）: " + system_message)
+    st.header("第二步：语音播放AI的回答")
 
+language = detect(system_message)
 
-if __name__ == '__main__':
-    # call main function
-    audiorec_demo_app()
+st.write("检测到输出语言:", language)
+print(language)
+
+def text_to_speech(text):
+    try:
+        tts = gTTS(text, lang=language, slow=False)
+        tts.save("translationresult.mp3")
+        st.write("Success TTS成功将AI回答转换为语音")
+        return "Success TTS成功将AI回答转换为语音"    
+    except Exception as e:
+        # Handle the error, e.g., print an error message or return a default text
+        print(f"Translation error: {e}")
+        st.write("TTS RESULT ERROR将AI回答转语音失败！")
+        return "TTS RESULT ERROR将AI回答转语音失败！"
+        st.stop()
+
+if system_message is None:
+    st.write("请先向AI提问！")    
+    st.stop()
+else: 
+    st.write("你的提问（AI问答模型中的记录transcript）")
+    st.write(transcript)
+    st.write("AI回答")            
+    ai_output_audio = text_to_speech(system_message)
+    audio_file = open("translationresult.mp3", "rb")
+    audio_bytes = audio_file.read()
+    st.audio("translationresult.mp3")
+    st.write(response)    
+    st.write(system_message)    
+
