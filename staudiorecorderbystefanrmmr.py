@@ -42,6 +42,7 @@ audio = st_audiorec() # tadaaaa! yes, that's it! :D
 audio_type = type(audio)
 print(audio_type)
 st.write(audio_type)
+st.write("---")
 
 if audio is not None:
     # To play audio in frontend:
