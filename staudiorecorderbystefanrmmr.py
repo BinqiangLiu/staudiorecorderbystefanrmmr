@@ -39,6 +39,10 @@ st.markdown('''<style>.css-nlntq9 a {color: #ff4c4b;}</style>''',
    # TITLE and Creator information
 st.title('by Stefan streamlit audio recorder')
 audio = st_audiorec() # tadaaaa! yes, that's it! :D
+audio_type = type(audio)
+print(audio_type)
+st.write(audio_type)
+
 if audio is not None:
     # To play audio in frontend:
     st.write("你输入的语音")
